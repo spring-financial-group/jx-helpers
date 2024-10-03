@@ -45,7 +45,7 @@ func GetRequirementsFromGit(g gitclient.Interface, gitURL string) (*jxcore.Requi
 
 // GetRequirementsAndGit gets the requirements from the given git URL and the git contents
 func GetRequirementsAndGit(g gitclient.Interface, gitURL string) (*jxcore.RequirementsConfig, string, error) {
-	dir, err := CloneClusterRepo(g, gitURL)
+	dir, err := CloneClusterRepo(g, gitURL, false, false, "")
 	if err != nil {
 		return nil, "", err
 	}
@@ -61,7 +61,7 @@ func GetRequirementsAndGit(g gitclient.Interface, gitURL string) (*jxcore.Requir
 	return &requirements.Spec, dir, nil
 }
 
-func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
+func CloneClusterRepo(g gitclient.Interface, gitURL string, partial, shallow bool, sparseCheckoutPatterns ...string) (string, error) {
 	// if we have a kubernetes secret with git auth mounted to the filesystem when running in cluster
 	// we need to turn it into a git credentials file see https://git-scm.com/docs/git-credential-store
 	secretMountPath := os.Getenv(credentialhelper.GIT_SECRET_MOUNT_PATH)
@@ -83,12 +83,27 @@ func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
 		}
 	}
 
-	// clone cluster repo to a temp dir and load the requirements
-	dir, err := gitclient.CloneToDir(g, gitURL, "")
-	if err != nil {
-		return "", fmt.Errorf("failed to clone cluster git repo %s: %w", gitURL, err)
+	if partial {
+		if shallow {
+			dir, err := gitclient.SparseCloneToDir(g, gitURL, "", true, sparseCheckoutPatterns...)
+			if err != nil {
+				return "", fmt.Errorf("failed to shallow clone cluster git repo %s: %w", gitURL, err)
+			}
+			return dir, nil
+		} else {
+			dir, err := gitclient.SparseCloneToDir(g, gitURL, "", false, sparseCheckoutPatterns...)
+			if err != nil {
+				return "", fmt.Errorf("failed to sparse clone cluster git repo %s: %w", gitURL, err)
+			}
+			return dir, nil
+		}
+	} else {
+		dir, err := gitclient.CloneToDir(g, gitURL, "")
+		if err != nil {
+			return "", fmt.Errorf("failed to clone cluster git repo %s: %w", gitURL, err)
+		}
+		return dir, nil
 	}
-	return dir, nil
 }
 
 // AddUserPasswordToURLFromDir loads the username and password files from the given directory and adds them to the URL if they are found
