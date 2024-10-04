@@ -45,7 +45,7 @@ func GetRequirementsFromGit(g gitclient.Interface, gitURL string) (*jxcore.Requi
 
 // GetRequirementsAndGit gets the requirements from the given git URL and the git contents
 func GetRequirementsAndGit(g gitclient.Interface, gitURL string) (*jxcore.RequirementsConfig, string, error) {
-	dir, err := CloneClusterRepo(g, gitURL, false, false, "")
+	dir, err := CloneClusterRepo(g, gitURL)
 	if err != nil {
 		return nil, "", err
 	}
@@ -61,7 +61,37 @@ func GetRequirementsAndGit(g gitclient.Interface, gitURL string) (*jxcore.Requir
 	return &requirements.Spec, dir, nil
 }
 
-func CloneClusterRepo(g gitclient.Interface, gitURL string, cloneType string, sparseCheckoutPatterns []string) (string, error) {
+func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
+	// if we have a kubernetes secret with git auth mounted to the filesystem when running in cluster
+	// we need to turn it into a git credentials file see https://git-scm.com/docs/git-credential-store
+	secretMountPath := os.Getenv(credentialhelper.GIT_SECRET_MOUNT_PATH)
+	if secretMountPath != "" {
+		err := credentialhelper.WriteGitCredentialFromSecretMount()
+		if err != nil {
+			return "", fmt.Errorf("failed to write git credentials file for secret %s : %w", secretMountPath, err)
+		}
+
+		gitURL, err = AddUserPasswordToURLFromDir(gitURL, secretMountPath)
+		if err != nil {
+			return "", fmt.Errorf("failed to add username and password to git URL: %w", err)
+		}
+	} else {
+		if kube.IsInCluster() {
+			log.Logger().Warnf("no $GIT_SECRET_MOUNT_PATH environment variable set")
+		} else {
+			log.Logger().Debugf("no $GIT_SECRET_MOUNT_PATH environment variable set")
+		}
+	}
+
+	// clone cluster repo to a temp dir and load the requirements
+	dir, err := gitclient.CloneToDir(g, gitURL, "")
+	if err != nil {
+		return "", fmt.Errorf("failed to clone cluster git repo %s: %w", gitURL, err)
+	}
+	return dir, nil
+}
+
+func CloneClusterRepoSparse(g gitclient.Interface, gitURL string, cloneType string, sparseCheckoutPatterns []string) (string, error) {
 	secretMountPath := os.Getenv(credentialhelper.GIT_SECRET_MOUNT_PATH)
 	if secretMountPath != "" {
 		err := credentialhelper.WriteGitCredentialFromSecretMount()
@@ -90,7 +120,7 @@ func CloneClusterRepo(g gitclient.Interface, gitURL string, cloneType string, sp
 		}
 		return dir, nil
 	case "partial", "shallow":
-		shallow := (cloneType == "shallow")
+		shallow := cloneType == "shallow"
 		dir, err := gitclient.SparseCloneToDir(g, gitURL, "", shallow, sparseCheckoutPatterns...)
 		if err != nil {
 			return "", fmt.Errorf("failed to sparse clone cluster git repo %s: %w", gitURL, err)
