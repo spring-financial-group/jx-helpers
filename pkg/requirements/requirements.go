@@ -64,7 +64,7 @@ func GetRequirementsAndGit(g gitclient.Interface, gitURL string) (*jxcore.Requir
 func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
 	// if we have a kubernetes secret with git auth mounted to the filesystem when running in cluster
 	// we need to turn it into a git credentials file see https://git-scm.com/docs/git-credential-store
-	gitURL, err := GitCredsFromCluster(gitURL)
+	gitURL, err := gitCredsFromCluster(gitURL)
 	if err != nil {
 		return "", err
 	}
@@ -78,7 +78,7 @@ func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
 }
 
 func CloneClusterRepoSparse(g gitclient.Interface, gitURL string, cloneType string, sparseCheckoutPatterns ...string) (string, error) {
-	gitURL, err := GitCredsFromCluster(gitURL)
+	gitURL, err := gitCredsFromCluster(gitURL)
 	if err != nil {
 		return "", err
 	}
