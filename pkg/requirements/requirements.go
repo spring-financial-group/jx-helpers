@@ -114,8 +114,7 @@ func AddUserPasswordToURLFromDir(gitURL, path string) (string, error) {
 	return gitURL, nil
 }
 
-// GitCredsFromCluster processes the Git credentials from the secret mount path and updates the gitURL accordingly.
-func GitCredsFromCluster(gitURL string) (string, error) {
+func gitCredsFromCluster(gitURL string) (string, error) {
 	secretMountPath := os.Getenv(credentialhelper.GIT_SECRET_MOUNT_PATH)
 	if secretMountPath != "" {
 		err := credentialhelper.WriteGitCredentialFromSecretMount()
