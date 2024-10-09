@@ -77,25 +77,17 @@ func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
 	return dir, nil
 }
 
-func CloneClusterRepoSparse(g gitclient.Interface, gitURL string, cloneType string, sparseCheckoutPatterns ...string) (string, error) {
+func CloneClusterRepoShallow(g gitclient.Interface, gitURL string) (string, error) {
 	gitURL, err := gitCredsFromCluster(gitURL)
 	if err != nil {
 		return "", err
 	}
-	// If shallow clone is requested, clone the repo with depth 1
-	if cloneType == "shallow" {
-		dir, err := gitclient.SparseCloneToDir(g, gitURL, "", true, sparseCheckoutPatterns...)
-		if err != nil {
-			return "", fmt.Errorf("failed to shallow clone cluster git repo %s: %w", gitURL, err)
-		}
-		return dir, nil
-	} else {
-		dir, err := gitclient.SparseCloneToDir(g, gitURL, "", false, sparseCheckoutPatterns...)
-		if err != nil {
-			return "", fmt.Errorf("failed to sparse clone cluster git repo %s: %w", gitURL, err)
-		}
-		return dir, nil
+	// shallowly clone HEAD of cluster repo to a temp dir and load the requirements
+	dir, err := gitclient.ShallowCloneToDir(g, gitURL, "")
+	if err != nil {
+		return "", fmt.Errorf("failed to clone cluster git repo %s: %w", gitURL, err)
 	}
+	return dir, nil
 }
 
 // AddUserPasswordToURLFromDir loads the username and password files from the given directory and adds them to the URL if they are found

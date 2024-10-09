@@ -354,6 +354,32 @@ func CloneToDir(g Interface, gitURL, dir string) (string, error) {
 	return dir, nil
 }
 
+// ShallowCloneToDir clones just the HEAD branch and contents of the git repo to the input directory
+func ShallowCloneToDir(g Interface, gitURL, dir string) (string, error) {
+	var err error
+	if dir != "" {
+		err = os.MkdirAll(dir, util.DefaultWritePermissions)
+		if err != nil {
+			return "", fmt.Errorf("failed to create directory %s: %w", dir, err)
+		}
+	} else {
+		dir, err = os.MkdirTemp("", "jx-git-")
+		if err != nil {
+			return "", fmt.Errorf("failed to create temporary directory: %w", err)
+		}
+	}
+
+	log.Logger().Debugf("shallow cloning %s to directory %s", termcolor.ColorInfo(gitURL), termcolor.ColorInfo(dir))
+
+	parentDir := filepath.Dir(dir)
+	sparseCloneArgs := []string{"clone", "--depth=1"}
+	_, err = g.Command(parentDir, append(sparseCloneArgs, gitURL, dir)...)
+	if err != nil {
+		return "", fmt.Errorf("failed to shallowly clone repository %s to directory: %s: %w", gitURL, dir, err)
+	}
+	return dir, nil
+}
+
 // SparseCloneToDir clones the git repository sparsely to either the given directory or create a temporary on.
 // SparseCheckoutPatterns are checked out interpreted as in .gitignore. If no sparseCheckoutPatterns are given the files
 // directly under the root of the repository are checked out.
