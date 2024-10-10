@@ -354,8 +354,8 @@ func CloneToDir(g Interface, gitURL, dir string) (string, error) {
 	return dir, nil
 }
 
-// ShallowCloneToDir clones just the HEAD branch and contents of the git repo to the input directory
-func ShallowCloneToDir(g Interface, gitURL, dir string) (string, error) {
+// ShallowCheckoutToDir checkout HEAD branch and contents of the repository
+func ShallowCheckoutToDir(g Interface, gitURL, dir string) (string, error) {
 	var err error
 	if dir != "" {
 		err = os.MkdirAll(dir, util.DefaultWritePermissions)

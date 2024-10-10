@@ -77,13 +77,13 @@ func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
 	return dir, nil
 }
 
-func CloneClusterRepoShallow(g gitclient.Interface, gitURL string) (string, error) {
+func ShallowCheckoutClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
 	gitURL, err := gitCredsFromCluster(gitURL)
 	if err != nil {
 		return "", err
 	}
 	// shallowly clone HEAD of cluster repo to a temp dir and load the requirements
-	dir, err := gitclient.ShallowCloneToDir(g, gitURL, "")
+	dir, err := gitclient.ShallowCheckoutToDir(g, gitURL, "")
 	if err != nil {
 		return "", fmt.Errorf("failed to clone cluster git repo %s: %w", gitURL, err)
 	}
