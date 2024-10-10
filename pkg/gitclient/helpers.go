@@ -331,17 +331,9 @@ func NthTag(g Interface, dir string, n int) (string, string, error) {
 
 // CloneToDir clones the git repository to either the given directory or create a temporary
 func CloneToDir(g Interface, gitURL, dir string) (string, error) {
-	var err error
-	if dir != "" {
-		err = os.MkdirAll(dir, util.DefaultWritePermissions)
-		if err != nil {
-			return "", fmt.Errorf("failed to create directory %s: %w", dir, err)
-		}
-	} else {
-		dir, err = os.MkdirTemp("", "jx-git-")
-		if err != nil {
-			return "", fmt.Errorf("failed to create temporary directory: %w", err)
-		}
+	dir, err := createDir(dir)
+	if err != nil {
+		return "", err
 	}
 
 	log.Logger().Debugf("cloning %s to directory %s", termcolor.ColorInfo(gitURL), termcolor.ColorInfo(dir))
@@ -359,17 +351,9 @@ func CloneToDir(g Interface, gitURL, dir string) (string, error) {
 // sparseCheckoutPatterns not supported
 // If shallow is true the clone is made with --depth=1
 func PartialCloneToDir(g Interface, gitURL, dir string, shallow bool) (string, error) {
-	var err error
-	if dir != "" {
-		err = os.MkdirAll(dir, util.DefaultWritePermissions)
-		if err != nil {
-			return "", fmt.Errorf("failed to create directory %s: %w", dir, err)
-		}
-	} else {
-		dir, err = os.MkdirTemp("", "jx-git-")
-		if err != nil {
-			return "", fmt.Errorf("failed to create temporary directory: %w", err)
-		}
+	dir, err := createDir(dir)
+	if err != nil {
+		return "", err
 	}
 
 	log.Logger().Debugf("shallow cloning %s to directory %s", termcolor.ColorInfo(gitURL), termcolor.ColorInfo(dir))
@@ -392,17 +376,9 @@ func PartialCloneToDir(g Interface, gitURL, dir string, shallow bool) (string, e
 // NOTE: This functionality is experimental and also the behaviour may vary between different git servers.
 // If shallow is true the clone is made with --depth=1
 func SparseCloneToDir(g Interface, gitURL, dir string, shallow bool, sparseCheckoutPatterns ...string) (string, error) {
-	var err error
-	if dir != "" {
-		err = os.MkdirAll(dir, util.DefaultWritePermissions)
-		if err != nil {
-			return "", fmt.Errorf("failed to create directory %s: %w", dir, err)
-		}
-	} else {
-		dir, err = os.MkdirTemp("", "jx-git-")
-		if err != nil {
-			return "", fmt.Errorf("failed to create temporary directory: %w", err)
-		}
+	dir, err := createDir(dir)
+	if err != nil {
+		return "", err
 	}
 
 	log.Logger().Debugf("cloning %s to directory %s sparsely", termcolor.ColorInfo(gitURL), termcolor.ColorInfo(dir))
@@ -596,6 +572,24 @@ func CheckoutRemoteBranch(g Interface, dir string, branch string) error {
 		return nil
 	}
 	return Checkout(g, dir, branch)
+}
+
+// createDir creates input directory if it does not exist, or creates a temporary directory
+// createDir creates the input directory if it does not exist, or creates a temporary directory
+func createDir(dir string) (string, error) {
+	var err error
+	if dir != "" {
+		err = os.MkdirAll(dir, util.DefaultWritePermissions)
+		if err != nil {
+			return "", fmt.Errorf("failed to create directory %s: %w", dir, err)
+		}
+	} else {
+		dir, err = os.MkdirTemp("", "jx-git-")
+		if err != nil {
+			return "", fmt.Errorf("failed to create temporary directory: %w", err)
+		}
+	}
+	return dir, nil
 }
 
 // GetLatestCommitMessage returns the latest git commit message
