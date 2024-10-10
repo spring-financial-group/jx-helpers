@@ -354,8 +354,11 @@ func CloneToDir(g Interface, gitURL, dir string) (string, error) {
 	return dir, nil
 }
 
-// ShallowCheckoutToDir checkout HEAD branch and contents of the repository
-func ShallowCheckoutToDir(g Interface, gitURL, dir string) (string, error) {
+// PartialCloneToDir Partially clones the git repository to either the given directory or create a temporary one
+// Alternative to SparseCloneToDir when git provider does not support sparse-checkout
+// sparseCheckoutPatterns not supported
+// If shallow is true the clone is made with --depth=1
+func PartialCloneToDir(g Interface, gitURL, dir string, shallow bool) (string, error) {
 	var err error
 	if dir != "" {
 		err = os.MkdirAll(dir, util.DefaultWritePermissions)
@@ -372,10 +375,13 @@ func ShallowCheckoutToDir(g Interface, gitURL, dir string) (string, error) {
 	log.Logger().Debugf("shallow cloning %s to directory %s", termcolor.ColorInfo(gitURL), termcolor.ColorInfo(dir))
 
 	parentDir := filepath.Dir(dir)
-	sparseCloneArgs := []string{"clone", "--depth=1"}
+	sparseCloneArgs := []string{"clone", "--filter=blob:none"}
+	if shallow {
+		sparseCloneArgs = append(sparseCloneArgs, "--depth=1")
+	}
 	_, err = g.Command(parentDir, append(sparseCloneArgs, gitURL, dir)...)
 	if err != nil {
-		return "", fmt.Errorf("failed to shallowly clone repository %s to directory: %s: %w", gitURL, dir, err)
+		return "", fmt.Errorf("failed to sparsely clone repository %s to directory: %s: %w", gitURL, dir, err)
 	}
 	return dir, nil
 }

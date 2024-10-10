@@ -77,15 +77,21 @@ func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
 	return dir, nil
 }
 
-func ShallowCheckoutClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
+func ShallowCloneClusterRepo(g gitclient.Interface, gitURL string, shallow bool, sparseCheckoutPatterns ...string) (string, error) {
 	gitURL, err := gitCredsFromCluster(gitURL)
 	if err != nil {
 		return "", err
 	}
-	// shallowly clone HEAD of cluster repo to a temp dir and load the requirements
-	dir, err := gitclient.ShallowCheckoutToDir(g, gitURL, "")
+	// Attempt sparse clone first
+	dir, err := gitclient.SparseCloneToDir(g, gitURL, "", shallow, sparseCheckoutPatterns...)
 	if err != nil {
-		return "", fmt.Errorf("failed to clone cluster git repo %s: %w", gitURL, err)
+		log.Logger().Warnf("failed sparse clone of cluster git repo %s: %v", gitURL, err)
+		// If sparse clone fails, fall back to partial clone
+		dir, err = gitclient.PartialCloneToDir(g, gitURL, "", shallow)
+		if err != nil {
+			return "", fmt.Errorf("failed partial clone of cluster git repo %s: %w", gitURL, err)
+		}
+		return dir, nil
 	}
 	return dir, nil
 }
