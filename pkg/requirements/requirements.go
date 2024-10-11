@@ -78,7 +78,7 @@ func CloneClusterRepo(g gitclient.Interface, gitURL string) (string, error) {
 }
 
 // PartialCloneClusterRepo clones the cluster repo to a temporary directory and returns the directory path
-// Attempts a sparse clone first, falling back to a partial clone without checkout patterns if sparse clone fails
+// Attempts a sparse clone first, falling back to a partial clone without checkout patterns, then a default clone
 func PartialCloneClusterRepo(g gitclient.Interface, gitURL string, shallow bool, sparseCheckoutPatterns ...string) (string, error) {
 	gitURL, err := gitCredsFromCluster(gitURL)
 	if err != nil {
@@ -92,7 +92,12 @@ func PartialCloneClusterRepo(g gitclient.Interface, gitURL string, shallow bool,
 		// If sparse clone fails, fall back to partial clone
 		dir, err = gitclient.PartialCloneToDir(g, gitURL, "", shallow)
 		if err != nil {
-			return "", fmt.Errorf("failed partial clone of cluster git repo %s: %w", gitURL, err)
+			log.Logger().Warnf("failed partial clone of cluster git repo %s: %v", gitURL, err)
+			log.Logger().Warnf("falling back to default clone, without checkout patterns")
+			dir, err = gitclient.CloneToDir(g, gitURL, "")
+			if err != nil {
+				return "", fmt.Errorf("failed to clone cluster git repo %s: %w", gitURL, err)
+			}
 		}
 		return dir, nil
 	}
