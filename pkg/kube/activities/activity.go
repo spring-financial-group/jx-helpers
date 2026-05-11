@@ -546,27 +546,6 @@ func (k *PromoteStepActivityKey) GetOrCreatePreview(jxClient versioned.Interface
 			return a, step, step.Preview, false, nil
 		}
 	}
-	// if there is no initial release Stage lets add one
-	if len(spec.Steps) == 0 {
-		endTime := time.Now()
-		startTime := endTime.Add(-1 * time.Minute)
-
-		spec.Steps = append(spec.Steps, v1.PipelineActivityStep{
-			Kind: v1.ActivityStepKindTypeStage,
-			Stage: &v1.StageActivityStep{
-				CoreActivityStep: v1.CoreActivityStep{
-					StartedTimestamp: &metav1.Time{
-						Time: startTime,
-					},
-					CompletedTimestamp: &metav1.Time{
-						Time: endTime,
-					},
-					Status: v1.ActivityStatusTypeSucceeded,
-					Name:   "Release",
-				},
-			},
-		})
-	}
 	// lets add a new step
 	preview := &v1.PreviewActivityStep{
 		CoreActivityStep: v1.CoreActivityStep{
@@ -635,27 +614,6 @@ func (k *PromoteStepActivityKey) GetOrCreatePromote(jxClient versioned.Interface
 		if k.matchesPromote(step) {
 			return a, step, step.Promote, false, nil
 		}
-	}
-	// if there is no initial release Stage lets add one
-	if len(spec.Steps) == 0 {
-		endTime := time.Now()
-		startTime := endTime.Add(-1 * time.Minute)
-
-		spec.Steps = append(spec.Steps, v1.PipelineActivityStep{
-			Kind: v1.ActivityStepKindTypeStage,
-			Stage: &v1.StageActivityStep{
-				CoreActivityStep: v1.CoreActivityStep{
-					StartedTimestamp: &metav1.Time{
-						Time: startTime,
-					},
-					CompletedTimestamp: &metav1.Time{
-						Time: endTime,
-					},
-					Status: v1.ActivityStatusTypeSucceeded,
-					Name:   "Release",
-				},
-			},
-		})
 	}
 	// lets add a new step
 	promote := &v1.PromoteActivityStep{
