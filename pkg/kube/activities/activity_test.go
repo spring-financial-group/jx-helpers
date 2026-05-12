@@ -156,19 +156,11 @@ func TestCreateOrUpdateActivities(t *testing.T) {
 	a, err := jxClient.JenkinsV1().PipelineActivities(nsObj.Namespace).Get(context.TODO(), expectedName, metav1.GetOptions{})
 	assert.NotNil(t, a, "should have a PipelineActivity for %s", expectedName)
 	steps := a.Spec.Steps
-	assert.Equal(t, 2, len(steps), "Should have 2 steps!")
+	assert.Equal(t, 1, len(steps), "Should have 1 step!")
 	step := a.Spec.Steps[0]
-	stage := step.Stage
-	assert.NotNil(t, stage, "step 0 should have a Stage")
-	assert.Equal(t, v1.ActivityStepKindTypeStage, step.Kind, "step - kind")
-	assert.Equal(t, v1.ActivityStatusTypeSucceeded, stage.Status, "step 0 Stage status")
-	assert.NotNil(t, stage.StartedTimestamp, "stage should have a StartedTimestamp")
-	assert.NotNil(t, stage.CompletedTimestamp, "stage should have a CompletedTimestamp")
-
-	step = a.Spec.Steps[1]
 	promote := step.Promote
-	assert.NotNil(t, promote, "step 1 should have a Promote")
-	assert.Equal(t, v1.ActivityStepKindTypePromote, step.Kind, "step 1 kind")
+	assert.NotNil(t, promote, "step 0 should have a Promote")
+	assert.Equal(t, v1.ActivityStepKindTypePromote, step.Kind, "step 0 kind")
 
 	pullRequestStep := promote.PullRequest
 	assert.NotNil(t, pullRequestStep, "Promote should have a PullRequest")
