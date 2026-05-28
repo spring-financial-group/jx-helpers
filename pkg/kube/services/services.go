@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
-	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 
 	v1 "k8s.io/api/core/v1"
 	nv1 "k8s.io/api/networking/v1"
@@ -115,6 +116,45 @@ func FindUrlFromVsIstio(dynamicClient dynamic.Interface, namespace, name string)
 	return getUrlFromVirtualService(virtualService)
 }
 
+func getHttpRoute(dynamicClient dynamic.Interface, namespace, name string) (*unstructured.Unstructured, error) {
+	dynamicClient, err := kube.LazyCreateDynamicClient(dynamicClient)
+	if err != nil {
+		return nil, err
+	}
+	httpRouteGVR := schema.GroupVersionResource{
+		Group:    "gateway.networking.k8s.io",
+		Version:  "v1",
+		Resource: "httproutes",
+	}
+	return dynamicClient.Resource(httpRouteGVR).Namespace(namespace).Get(
+		context.TODO(), name, meta_v1.GetOptions{},
+	)
+}
+
+func getUrlFromHttpRoute(httpRoute *unstructured.Unstructured) (string, error) {
+	spec, ok := httpRoute.Object["spec"].(map[string]interface{})
+	if !ok {
+		return "", errors.New("no spec found in HTTPRoute")
+	}
+	hostnames, ok := spec["hostnames"].([]interface{})
+	if !ok || len(hostnames) == 0 {
+		return "", errors.New("no hostnames found in HTTPRoute")
+	}
+	// TODO: Get the protocol from the Parent Gateway
+	// in the meantime, assume https is supported
+	return "https://" + fmt.Sprintf("%v", hostnames[0]), nil
+}
+
+// FindUrlFromHttpRoute finds the host from a Gateway API HTTPRoute
+func FindUrlFromHttpRoute(dynamicClient dynamic.Interface, namespace, name string) (string, error) {
+	httpRoute, err := getHttpRoute(dynamicClient, namespace, name)
+	if err != nil {
+		return "", nil
+	}
+	log.Logger().Debugf("Attempting to find url via HTTPRoute")
+	return getUrlFromHttpRoute(httpRoute)
+}
+
 func FindServiceURLWithDynamicClient(client kubernetes.Interface, namespace string, name string, dynamicClient dynamic.Interface) (string, error) {
 	log.Logger().Debugf("Finding service url for %s in namespace %s", name, namespace)
 	svc, err := client.CoreV1().Services(namespace).Get(context.TODO(), name, meta_v1.GetOptions{})
@@ -141,13 +181,23 @@ func FindServiceURLWithDynamicClient(client kubernetes.Interface, namespace stri
 		err = nil
 	}
 	if err != nil {
-		log.Logger().Debugf("Unable to finding ingress for %s in namespace %s - err %s", name, namespace, err)
+		log.Logger().Debugf("Unable to find ingress for %s in namespace %s - err %s", name, namespace, err)
+		log.Logger().Debugf("Attempting to look up via http route")
+		url, hr_err := FindUrlFromHttpRoute(dynamicClient, namespace, name)
+		if url != "" && hr_err == nil {
+			return url, nil
+		}
+		if hr_err != nil {
+			log.Logger().Debugf("Unable to find http route for %s in namespace %s", name, namespace)
+		}
+		log.Logger().Debugf("Unable to find http route for %s in namespace %s", name, namespace)
+		log.Logger().Debugf("Attempting to look up via istio virtual services")
 		url, vs_err := FindUrlFromVsIstio(dynamicClient, namespace, name)
 		if url != "" && vs_err == nil {
 			return url, nil
 		}
 		if vs_err != nil {
-			log.Logger().Debugf("Unable to finding istio for %s in namespace %s - err %s", name, namespace, vs_err)
+			log.Logger().Debugf("Unable to find istio for %s in namespace %s - err %s", name, namespace, vs_err)
 		}
 		return "", fmt.Errorf("getting ingress for service %q in namespace %s: %w", name, namespace, err)
 	}
@@ -157,6 +207,16 @@ func FindServiceURLWithDynamicClient(client kubernetes.Interface, namespace stri
 
 	if url == "" {
 		log.Logger().Debugf("Unable to find service url via ingress for %s in namespace %s", name, namespace)
+		log.Logger().Debugf("Attempting to look up via http route")
+		url, hr_err := FindUrlFromHttpRoute(dynamicClient, namespace, name)
+		if url != "" && hr_err == nil {
+			return url, nil
+		}
+		if hr_err != nil {
+			log.Logger().Debugf("Unable to find http route for %s in namespace %s", name, namespace)
+		}
+		log.Logger().Debugf("Unable to find http route for %s in namespace %s", name, namespace)
+		log.Logger().Debugf("Attempting to look up via istio virtual services")
 		url, vs_err := FindUrlFromVsIstio(dynamicClient, namespace, name)
 		if url != "" && vs_err == nil {
 			return url, nil
@@ -188,7 +248,7 @@ func FindIngressURL(client kubernetes.Interface, namespace string, name string) 
 	return url, nil
 }
 
-// IngressURL returns the URL for the ingres
+// IngressURL returns the URL for the ingress
 func IngressURL(ing *nv1.Ingress) string {
 	if ing == nil {
 		log.Logger().Debug("Ingress is nil, returning empty string for url")
@@ -232,7 +292,7 @@ func IngressURL(ing *nv1.Ingress) string {
 	return url
 }
 
-// IngressHost returns the host for the ingres
+// IngressHost returns the host for the ingress
 func IngressHost(ing *nv1.Ingress) string {
 	if ing != nil {
 		if len(ing.Spec.Rules) > 0 {
