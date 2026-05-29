@@ -110,6 +110,7 @@ func getUrlFromVirtualService(virtualService *unstructured.Unstructured) (string
 func FindUrlFromVsIstio(dynamicClient dynamic.Interface, namespace, name string) (string, error) {
 	virtualService, err := getIstioVirtualService(dynamicClient, namespace, name)
 	if err != nil {
+		log.Logger().Warnf("Failed to find URL via istio virtual services %v", err)
 		return "", nil
 	}
 	log.Logger().Debugf("Attempting to find via istio virtual services")
@@ -149,6 +150,7 @@ func getUrlFromHttpRoute(httpRoute *unstructured.Unstructured) (string, error) {
 func FindUrlFromHttpRoute(dynamicClient dynamic.Interface, namespace, name string) (string, error) {
 	httpRoute, err := getHttpRoute(dynamicClient, namespace, name)
 	if err != nil {
+		log.Logger().Warnf("Failed to find URL via http route %v", err)
 		return "", nil
 	}
 	log.Logger().Debugf("Attempting to find url via HTTPRoute")
@@ -207,19 +209,19 @@ func FindServiceURLWithDynamicClient(client kubernetes.Interface, namespace stri
 
 	if url == "" {
 		log.Logger().Debugf("Unable to find service url via ingress for %s in namespace %s", name, namespace)
-		log.Logger().Debugf("Attempting to look up via http route")
-		url, hr_err := FindUrlFromHttpRoute(dynamicClient, namespace, name)
-		if url != "" && hr_err == nil {
-			return url, nil
+		log.Logger().Debugf("Attempting look up via http route...")
+		hr_url, hr_err := FindUrlFromHttpRoute(dynamicClient, namespace, name)
+		if hr_url != "" && hr_err == nil {
+			return hr_url, nil
 		}
 		if hr_err != nil {
 			log.Logger().Debugf("Unable to find http route for %s in namespace %s", name, namespace)
 		}
 		log.Logger().Debugf("Unable to find http route for %s in namespace %s", name, namespace)
-		log.Logger().Debugf("Attempting to look up via istio virtual services")
-		url, vs_err := FindUrlFromVsIstio(dynamicClient, namespace, name)
-		if url != "" && vs_err == nil {
-			return url, nil
+		log.Logger().Debugf("Attempting look up via istio virtual services...")
+		vs_url, vs_err := FindUrlFromVsIstio(dynamicClient, namespace, name)
+		if vs_url != "" && vs_err == nil {
+			return vs_url, nil
 		}
 		if vs_err != nil {
 			log.Logger().Debugf("Unable to finding istio for %s in namespace %s - err %s", name, namespace, vs_err)
