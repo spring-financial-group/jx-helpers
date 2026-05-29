@@ -452,3 +452,45 @@ func TestGetUrlFromVirtualService(t *testing.T) {
 	}
 	assert.Equal(t, err, nil)
 }
+
+func TestGetUrlFromHttpRoute(t *testing.T) {
+	var namespace = "default"
+	var name = "jenkins"
+
+	httpRouteGVR := schema.GroupVersionResource{
+		Group:    "gateway.networking.k8s.io",
+		Version:  "v1",
+		Resource: "httproutes",
+	}
+
+	scheme := runtime.NewScheme()
+	scheme.AddKnownTypeWithName(
+		httpRouteGVR.GroupVersion().WithKind("HTTPRouteList"),
+		&unstructured.UnstructuredList{},
+	)
+
+	// no HTTPRoute present
+	dynamicClient := fakedyn.NewSimpleDynamicClient(scheme)
+	url, err := services.FindUrlFromHttpRoute(dynamicClient, namespace, name)
+	assert.Equal(t, "", url)
+	assert.NoError(t, err)
+
+	// HTTPRoute present with a hostname
+	httpRoute := &unstructured.Unstructured{}
+	httpRoute.SetUnstructuredContent(map[string]interface{}{
+		"apiVersion": "gateway.networking.k8s.io/v1",
+		"kind":       "HTTPRoute",
+		"metadata": map[string]interface{}{
+			"name":      name,
+			"namespace": namespace,
+		},
+		"spec": map[string]interface{}{
+			"hostnames": []interface{}{"testing.jenkins-x.in"},
+		},
+	})
+	dynamicClient = fakedyn.NewSimpleDynamicClient(scheme, httpRoute)
+	url, err = services.FindUrlFromHttpRoute(dynamicClient, namespace, name)
+	if assert.NoError(t, err) {
+		assert.Equal(t, "https://testing.jenkins-x.in", url)
+	}
+}
