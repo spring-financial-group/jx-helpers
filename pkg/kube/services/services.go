@@ -141,7 +141,7 @@ func getUrlFromHttpRoute(httpRoute *unstructured.Unstructured) (string, error) {
 		return "", errors.New("no hostnames found in HTTPRoute")
 	}
 	// TODO: Get the protocol from the Parent Gateway
-	// in the meantime, assume https is supported
+	// in the meantime, assume https
 	return "https://" + fmt.Sprintf("%v", hostnames[0]), nil
 }
 
