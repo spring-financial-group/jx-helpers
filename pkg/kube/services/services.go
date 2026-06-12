@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
-	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 
 	v1 "k8s.io/api/core/v1"
 	nv1 "k8s.io/api/networking/v1"
@@ -125,6 +126,53 @@ func FindURLFromVSIstio(dynamicClient dynamic.Interface, namespace, name string)
 	return getURLFromVirtualService(virtualService)
 }
 
+func getHTTPRoute(dynamicClient dynamic.Interface, namespace, name string) (*unstructured.Unstructured, error) {
+	dynamicClient, err := kube.LazyCreateDynamicClient(dynamicClient)
+	if err != nil {
+		return "", err
+	}
+	// Create a GVR for a HTTPRoute
+	httpRouteGVR := schema.GroupVersionResource{
+		Group:    "gateway.networking.k8s.io",
+		Version:  "v1",
+		Resource: "httproutes",
+	}
+	httpRoute, err := dynamicClient.Resource(httpRouteGVR).Namespace(namespace).Get(context.TODO(), name, meta_v1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return httpRoute, nil
+}
+
+func getURLFromHTTPRoute(httpRoute *unstructured.Unstructured) (string, error) {
+	if spec, ok := httpRoute.Object["spec"].(map[string]interface{}); ok {
+		if hostnames, ok := spec["hostnames"].([]interface{}); ok && len(hostnames) > 0 {
+			if hostname := fmt.Sprintf("%v", hostnames[0]); hostname != "" {
+				return "http://" + hostname, nil
+			}
+		}
+	}
+	return "", errors.New("no URL found in the HTTPRoute")
+}
+
+// FindURLFromHTTPRoute finds the URL from the HTTPRoute resource
+func FindURLFromHTTPRoute(dynamicClient dynamic.Interface, namespace, name string) (string, error) {
+	log.Logger().Debugf("finding url from HTTP route %s in namespace %s", name, namespace)
+	httpRoute, err := getHTTPRoute(dynamicClient, namespace, name)
+	if err != nil {
+		switch {
+		// HTTPRoute not found but no other errors occurred. Log and return nil err
+			case apierrors.IsNotFound(err):
+				log.Logger().Debugf("HTTPRoute %s not reachable in namespace %s", name, namespace)
+				return "", nil
+			default:
+				return "", fmt.Errorf("finding the HTTP route %s in namespace %s: %w", name, namespace, err)
+		}
+	}
+	log.Logger().Debugf("attempting to find URL via HTTPRoute")
+	return getURLFromHTTPRoute(httpRoute)
+}
+
 
 // FindURLFromIngress finds the URL from the Ingress resource using the kubernetes client
 func FindURLFromIngress(client kubernetes.Interface, namespace string, name string) (string, error) {
@@ -176,6 +224,18 @@ func FindServiceURLWithDynamicClient(client kubernetes.Interface, namespace stri
 	url, err = FindURLFromIngress(client, namespace, name)
 	if err != nil {
 		log.Logger().Debugf("unable to find url via ingress for %s in namespace %s - err %s", name, namespace, err)
+	}
+	if url != "" {
+		log.Logger().Debugf("found ingress url %s", url)
+		return url, nil
+	}
+
+	log.Logger().Debugf("couldn't find url via ingress, attempting to look up via HTTPRoute")
+
+	// let's try finding the URL via HTTPRoute
+	url, err = FindURLFromHTTPRoute(dynamicClient, namespace, name)
+	if err != nil {
+		log.Logger().Debugf("unable to find url via HTTPRoute for %s in namespace %s - err %s", name, namespace, err)
 	}
 	if url != "" {
 		log.Logger().Debugf("found ingress url %s", url)
