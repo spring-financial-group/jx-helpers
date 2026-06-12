@@ -129,7 +129,7 @@ func FindURLFromVSIstio(dynamicClient dynamic.Interface, namespace, name string)
 func getHTTPRoute(dynamicClient dynamic.Interface, namespace, name string) (*unstructured.Unstructured, error) {
 	dynamicClient, err := kube.LazyCreateDynamicClient(dynamicClient)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	// Create a GVR for a HTTPRoute
 	httpRouteGVR := schema.GroupVersionResource{
@@ -144,15 +144,114 @@ func getHTTPRoute(dynamicClient dynamic.Interface, namespace, name string) (*uns
 	return httpRoute, nil
 }
 
-func getURLFromHTTPRoute(httpRoute *unstructured.Unstructured) (string, error) {
-	if spec, ok := httpRoute.Object["spec"].(map[string]interface{}); ok {
-		if hostnames, ok := spec["hostnames"].([]interface{}); ok && len(hostnames) > 0 {
-			if hostname := fmt.Sprintf("%v", hostnames[0]); hostname != "" {
-				return "http://" + hostname, nil
+func getGateway(dynamicClient dynamic.Interface, namespace, name string) (*unstructured.Unstructured, error) {
+	dynamicClient, err := kube.LazyCreateDynamicClient(dynamicClient)
+	if err != nil {
+		return nil, err
+	}
+	// Create a GVR for a Gateway
+	gatewayGVR := schema.GroupVersionResource{
+		Group:    "gateway.networking.k8s.io",
+		Version:  "v1",
+		Resource: "gateways",
+	}
+	gateway, err := dynamicClient.Resource(gatewayGVR).Namespace(namespace).Get(context.TODO(), name, meta_v1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return gateway, nil
+}
+
+// getGatewayListenerProtocol gets the protocol (HTTP or HTTPS) of the listener attached to the HTTPRoute via its parentRefs
+func getGatewayListenerProtocol(dynamicClient dynamic.Interface, httpRoute *unstructured.Unstructured) (string, error) {
+	spec, ok := httpRoute.Object["spec"].(map[string]interface{})
+	if !ok {
+		return "", errors.New("no spec found in the HTTPRoute")
+	}
+	parentRefs, ok := spec["parentRefs"].([]interface{})
+	if !ok || len(parentRefs) == 0 {
+		return "", errors.New("no parentRefs found in the HTTPRoute")
+	}
+	parentRef, ok := parentRefs[0].(map[string]interface{})
+	if !ok {
+		return "", errors.New("invalid parentRef in the HTTPRoute")
+	}
+	gatewayName, _ := parentRef["name"].(string)
+	if gatewayName == "" {
+		return "", errors.New("no parent Gateway name in the HTTPRoute")
+	}
+	// the parent Gateway defaults to the HTTPRoute's namespace unless explicitly set
+	gatewayNamespace := httpRoute.GetNamespace()
+	if ns, ok := parentRef["namespace"].(string); ok && ns != "" {
+		gatewayNamespace = ns
+	}
+	// sectionName optionally pins a specific listener on the Gateway
+	sectionName, _ := parentRef["sectionName"].(string)
+
+	gateway, err := getGateway(dynamicClient, gatewayNamespace, gatewayName)
+	if err != nil {
+		return "", err
+	}
+	return getListenerProtocol(gateway, sectionName)
+}
+
+// getListenerProtocol returns the protocol of the Gateway listener named by sectionName,
+// or the first listener's protocol when sectionName is empty
+func getListenerProtocol(gateway *unstructured.Unstructured, sectionName string) (string, error) {
+	spec, ok := gateway.Object["spec"].(map[string]interface{})
+	if !ok {
+		return "", errors.New("no spec found in the Gateway")
+	}
+	listeners, ok := spec["listeners"].([]interface{})
+	if !ok || len(listeners) == 0 {
+		return "", errors.New("no listeners found in the Gateway")
+	}
+	for _, l := range listeners {
+		listener, ok := l.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		// when a sectionName is given, only the listener with the matching name is relevant
+		if sectionName != "" {
+			if name, _ := listener["name"].(string); name != sectionName {
+				continue
 			}
 		}
+		if protocol, ok := listener["protocol"].(string); ok && protocol != "" {
+			return protocol, nil
+		}
+		// no sectionName: only the first listener is considered
+		if sectionName == "" {
+			break
+		}
 	}
-	return "", errors.New("no URL found in the HTTPRoute")
+	return "", errors.New("no matching listener protocol found in the Gateway")
+}
+
+func getURLFromHTTPRoute(dynamicClient dynamic.Interface, httpRoute *unstructured.Unstructured) (string, error) {
+	spec, ok := httpRoute.Object["spec"].(map[string]interface{})
+	if !ok {
+		return "", errors.New("no URL found in the HTTPRoute")
+	}
+	hostnames, ok := spec["hostnames"].([]interface{})
+	if !ok || len(hostnames) == 0 {
+		return "", errors.New("no URL found in the HTTPRoute")
+	}
+	hostname := fmt.Sprintf("%v", hostnames[0])
+	if hostname == "" {
+		return "", errors.New("no URL found in the HTTPRoute")
+	}
+
+	// best-effort: derive the scheme from the parent Gateway listener's protocol,
+	// defaulting to http when the Gateway is unreadable so URL discovery still succeeds
+	scheme := "http"
+	protocol, err := getGatewayListenerProtocol(dynamicClient, httpRoute)
+	if err != nil {
+		log.Logger().Debugf("unable to determine protocol from parent Gateway listener, defaulting to http: %s", err)
+	} else if strings.EqualFold(protocol, "HTTPS") {
+		scheme = "https"
+	}
+	return scheme + "://" + hostname, nil
 }
 
 // FindURLFromHTTPRoute finds the URL from the HTTPRoute resource
@@ -162,17 +261,16 @@ func FindURLFromHTTPRoute(dynamicClient dynamic.Interface, namespace, name strin
 	if err != nil {
 		switch {
 		// HTTPRoute not found but no other errors occurred. Log and return nil err
-			case apierrors.IsNotFound(err):
-				log.Logger().Debugf("HTTPRoute %s not reachable in namespace %s", name, namespace)
-				return "", nil
-			default:
-				return "", fmt.Errorf("finding the HTTP route %s in namespace %s: %w", name, namespace, err)
+		case apierrors.IsNotFound(err):
+			log.Logger().Debugf("HTTPRoute %s not reachable in namespace %s", name, namespace)
+			return "", nil
+		default:
+			return "", fmt.Errorf("finding the HTTP route %s in namespace %s: %w", name, namespace, err)
 		}
 	}
 	log.Logger().Debugf("attempting to find URL via HTTPRoute")
-	return getURLFromHTTPRoute(httpRoute)
+	return getURLFromHTTPRoute(dynamicClient, httpRoute)
 }
-
 
 // FindURLFromIngress finds the URL from the Ingress resource using the kubernetes client
 func FindURLFromIngress(client kubernetes.Interface, namespace string, name string) (string, error) {
@@ -233,12 +331,13 @@ func FindServiceURLWithDynamicClient(client kubernetes.Interface, namespace stri
 	log.Logger().Debugf("couldn't find url via ingress, attempting to look up via HTTPRoute")
 
 	// let's try finding the URL via HTTPRoute
-	url, err = FindURLFromHTTPRoute(dynamicClient, namespace, name)
-	if err != nil {
-		log.Logger().Debugf("unable to find url via HTTPRoute for %s in namespace %s - err %s", name, namespace, err)
+	// use a dedicated error variable so an optional HTTPRoute failure doesn't clobber a genuine ingress error
+	url, hrErr := FindURLFromHTTPRoute(dynamicClient, namespace, name)
+	if hrErr != nil {
+		log.Logger().Debugf("unable to find url via HTTPRoute for %s in namespace %s - err %s", name, namespace, hrErr)
 	}
 	if url != "" {
-		log.Logger().Debugf("found ingress url %s", url)
+		log.Logger().Debugf("found HTTPRoute url %s", url)
 		return url, nil
 	}
 
