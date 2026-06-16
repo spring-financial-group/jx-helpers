@@ -6,8 +6,8 @@ import (
 
 	"github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned"
 	fakejx "github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned/fake"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jxenv"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/jxenv"
 	"github.com/jenkins-x/jx-kube-client/v3/pkg/kubeclient"
 )
 

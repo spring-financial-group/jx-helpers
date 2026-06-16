@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/requirements"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/requirements"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

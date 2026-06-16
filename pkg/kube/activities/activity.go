@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/naming"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/naming"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/selection"

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/naming"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/options"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/naming"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/options"
 
 	"github.com/sethvargo/go-envconfig"
 	"github.com/spf13/cobra"

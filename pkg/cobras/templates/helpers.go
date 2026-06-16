@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	jxCore "github.com/jenkins-x/jx-api/v4/pkg/apis/jenkins.io/v1"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/extensions"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/extensions"
 	"github.com/spf13/cobra"
 	"k8s.io/apimachinery/pkg/util/sets"
 )

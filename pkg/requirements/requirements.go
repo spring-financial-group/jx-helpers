@@ -7,19 +7,19 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/files"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/stringhelpers"
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/credentialhelper"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/credentialhelper"
 
 	jxcore "github.com/jenkins-x/jx-api/v4/pkg/apis/core/v4beta1"
 	"github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jxenv"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/jxenv"
 )
 
 // GetClusterRequirementsConfig returns the cluster requirements from the cluster git repo

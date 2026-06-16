@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/jenkins-x/go-scm/scm"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/input"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/options"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/input"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/options"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/termcolor"
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 )
 

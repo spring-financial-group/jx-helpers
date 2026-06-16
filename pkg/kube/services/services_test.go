@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/services"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/services"
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"

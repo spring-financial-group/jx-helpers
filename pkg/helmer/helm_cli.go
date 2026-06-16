@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/cmdrunner"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/files"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/termcolor"
 
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 )

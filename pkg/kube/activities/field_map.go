@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	v1 "github.com/jenkins-x/jx-api/v4/pkg/apis/jenkins.io/v1"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/maps"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/maps"
 )
 
 // FieldMap is a map of field:value. It implements fields.Fields.

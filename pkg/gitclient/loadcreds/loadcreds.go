@@ -12,14 +12,14 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/credentialhelper"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/credentialhelper"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/homedir"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/files"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/homedir"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/termcolor"
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 )
 

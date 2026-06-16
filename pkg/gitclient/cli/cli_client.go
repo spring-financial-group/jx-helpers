@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/cmdrunner"
 )
 
 type client struct {

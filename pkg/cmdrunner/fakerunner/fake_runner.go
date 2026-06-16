@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/cmdrunner"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

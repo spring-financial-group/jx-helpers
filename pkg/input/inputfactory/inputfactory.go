@@ -1,10 +1,10 @@
 package inputfactory
 
 import (
-	"github.com/jenkins-x/jx-helpers/v3/pkg/input"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/input/batch"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/input/survey"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/options"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/input"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/input/batch"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/input/survey"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/options"
 )
 
 // NewInput creates a new input interface depending on if batch mode is enabled or not

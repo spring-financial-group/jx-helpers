@@ -13,8 +13,8 @@ import (
 	v1 "github.com/jenkins-x/jx-api/v4/pkg/apis/jenkins.io/v1"
 	jxfake "github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned/fake"
 	typev1 "github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned/typed/jenkins.io/v1"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/activities"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/activities"
 	appsv1 "k8s.io/api/apps/v1"
 	k8s_v1 "k8s.io/api/core/v1"
 

@@ -8,12 +8,12 @@ import (
 
 	"github.com/jenkins-x/go-scm/scm"
 	"github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/cli"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/gitdiscovery"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/cmdrunner"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/cli"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/gitdiscovery"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/stringhelpers"
 
 	"github.com/spf13/cobra"
 )

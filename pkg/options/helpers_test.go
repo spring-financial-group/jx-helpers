@@ -3,7 +3,7 @@ package options_test
 import (
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/options"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/options"
 	"github.com/stretchr/testify/assert"
 )
 

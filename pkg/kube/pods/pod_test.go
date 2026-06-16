@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/pods"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/yamls"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/pods"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/yamls"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"

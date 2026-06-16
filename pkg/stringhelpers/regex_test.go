@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/stringhelpers"
 	"github.com/stretchr/testify/assert"
 )
 

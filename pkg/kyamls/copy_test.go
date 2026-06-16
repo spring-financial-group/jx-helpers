@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/testhelpers"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/files"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/testhelpers"
 	"github.com/stretchr/testify/assert"
 )
 

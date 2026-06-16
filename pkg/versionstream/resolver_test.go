@@ -7,7 +7,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/versionstream"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/versionstream"
 
 	"github.com/stretchr/testify/assert"
 )

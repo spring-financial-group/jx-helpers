@@ -6,7 +6,7 @@ package naming_test
 import (
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/naming"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/naming"
 	"github.com/stretchr/testify/assert"
 )
 

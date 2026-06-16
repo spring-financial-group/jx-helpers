@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	jxcore "github.com/jenkins-x/jx-api/v4/pkg/apis/core/v4beta1"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/requirements"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/requirements"
 	"github.com/stretchr/testify/assert"
 )
 

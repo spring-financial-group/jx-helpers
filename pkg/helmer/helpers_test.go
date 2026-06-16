@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	helm "github.com/jenkins-x/jx-helpers/v3/pkg/helmer"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/maps"
+	helm "github.com/spring-financial-group/jx-helpers/v3/pkg/helmer"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/maps"
 	"github.com/magiconair/properties/assert"
 )
 

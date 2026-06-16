@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/fatih/color"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stripansi"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/stripansi"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/termcolor"
 	"github.com/stretchr/testify/assert"
 )
 

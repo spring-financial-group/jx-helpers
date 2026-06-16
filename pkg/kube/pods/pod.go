@@ -12,8 +12,8 @@ import (
 
 	"k8s.io/client-go/kubernetes/scheme"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/naming"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/naming"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/termcolor"
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 
 	corev1 "k8s.io/api/core/v1"

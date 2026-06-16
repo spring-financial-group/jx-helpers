@@ -10,9 +10,9 @@ import (
 	"github.com/jenkins-x/go-scm/scm"
 	"github.com/jenkins-x/go-scm/scm/factory"
 	"github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/loadcreds"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jxclient"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/loadcreds"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/jxclient"
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

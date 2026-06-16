@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	v1 "github.com/jenkins-x/jx-api/v4/pkg/apis/jenkins.io/v1"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/activities"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube/activities"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

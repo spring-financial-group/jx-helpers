@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/stringhelpers"
 )
 
 const (

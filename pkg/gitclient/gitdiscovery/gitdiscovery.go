@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/gitconfig"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/gitconfig"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/giturl"
 )
 
 // FindGitURLFromDir tries to find the git clone URL from the given directory

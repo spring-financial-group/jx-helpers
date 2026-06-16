@@ -9,7 +9,7 @@ import (
 	"github.com/Netflix/go-expect"
 	pseudotty "github.com/creack/pty"
 	"github.com/hinshun/vt10x"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/input/survey"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/input/survey"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/jenkins-x/go-scm/scm"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/scmhelpers"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/scmhelpers"
 	"github.com/stretchr/testify/assert"
 )
 

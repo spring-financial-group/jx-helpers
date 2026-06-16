@@ -11,7 +11,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 
-	. "github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/credentialhelper"
+	. "github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/credentialhelper"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"

@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/cli"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/cmdrunner"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/gitclient/cli"
 )
 
 // GetDefaultBranch gets the default branch name for tests

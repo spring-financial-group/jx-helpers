@@ -1,8 +1,8 @@
 package versionstream
 
 import (
-	"github.com/jenkins-x/jx-helpers/v3/pkg/errorutil"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/errorutil"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/stringhelpers"
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 )
 

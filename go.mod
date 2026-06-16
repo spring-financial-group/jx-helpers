@@ -1,4 +1,4 @@
-module github.com/jenkins-x/jx-helpers/v3
+module github.com/spring-financial-group/jx-helpers/v3
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7

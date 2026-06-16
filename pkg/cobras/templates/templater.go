@@ -21,8 +21,8 @@ import (
 	"text/template"
 	"unicode"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/table"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/table"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/termcolor"
 	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"

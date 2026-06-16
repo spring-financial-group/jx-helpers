@@ -1,7 +1,7 @@
 package duck
 
 import (
-	"github.com/jenkins-x/jx-helpers/v3/pkg/knative_pkg/kmeta"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/knative_pkg/kmeta"
 )
 
 // OneOfOurs is the union of our Accessor interface and the OwnerRefable interface

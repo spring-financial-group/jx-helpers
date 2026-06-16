@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
-	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner/fakerunner"
-	helm "github.com/jenkins-x/jx-helpers/v3/pkg/helmer"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/cmdrunner"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/cmdrunner/fakerunner"
+	helm "github.com/spring-financial-group/jx-helpers/v3/pkg/helmer"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -8,9 +8,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/stringhelpers"
 
-	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
+	"github.com/spring-financial-group/jx-helpers/v3/pkg/kube"
 
 	v1 "github.com/jenkins-x/jx-api/v4/pkg/apis/jenkins.io/v1"
 	"github.com/jenkins-x/jx-api/v4/pkg/client/clientset/versioned"
